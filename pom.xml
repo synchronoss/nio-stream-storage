@@ -174,11 +174,11 @@
         </license>
     </licenses>
 
-    <!--<scm>-->
-        <!--<connection>scm:git:https://github.com/synchronoss/nio-multipart.git</connection>-->
-        <!--<developerConnection>scm:git:git@github.com:synchronoss/nio-multipart.git</developerConnection>-->
-        <!--<url>https://github.com/synchronoss/nio-multipart</url>-->
-    <!--</scm>-->
+    <scm>
+        <connection>scm:git:https://github.com/synchronoss/nio-stream-storage.git</connection>
+        <developerConnection>scm:git:git@github.com:synchronoss/nio-stream-storage.git</developerConnection>
+        <url>https://github.com/synchronoss/nio-stream-storage</url>
+    </scm>
 
     <!--<ciManagement>-->
         <!--<system>Travis CI</system>-->

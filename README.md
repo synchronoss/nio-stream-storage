@@ -8,13 +8,13 @@ If the data is smaller than a configurable threshold the data is kept in memory,
 
 Description
 -----------
-The **DeferredFileByteStore** has two distinct states:
+The **DeferredFileStreamStorage** has two distinct states:
 
- * The **ByteStore** is ONLY writable and NOT readable.
- * The **ByteStore** is ONLY readable and NOT writable.
+ * The **StreamStorage** is ONLY writable and NOT readable.
+ * The **StreamStorage** is ONLY readable and NOT writable.
 
 A new instance will always start in a *write* state, ready to accept bytes and any call to the *getInputStream()* will fail.
-Once all the data has been written, the *close()* method needs to be called to close the write channel and switch the **DeferredFileByteStore** to the *read* state.
+Once all the data has been written, the *close()* method needs to be called to close the write channel and switch the **DeferredFileStreamStorage** to the *read* state.
 When the *purgeFileAfterReadComplete* flag is set to true the **PurgeOnCloseFileInputStream** ensures the temporary storage file is deleted if it exists.
 At that point the data can be read via *getInputStream()*.
 
