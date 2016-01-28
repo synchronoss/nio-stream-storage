@@ -8,11 +8,6 @@ jdk:
 
 install: mvn install -U
 
-script: mvn verify -Pintegration-tests -pl integration-tests -Dapplication.server.port=8181 -Dmaven.javadoc.skip=true
-
-after_success:
-  - util/deploy.sh
-
 cache:
   directories:
   - $HOME/.m2
