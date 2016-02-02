@@ -13,27 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.synchronoss.cloud.nio.stream.storage;
 
-
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.File;
 
 /**
- * <p> Defines a storage that allows to store bytes and read them back.
- *     This class extends {@code OutputStream} to allow the write operations, and it exposes the {@link #getInputStream()} method
- *     to read the data back.
+ * <p> A factory for {@code StreamStorage}.
  *
- * @author Silvano Riz.
+ * <p> Default implementation is {@link DeferredFileStreamStorageFactory}
+ *
  */
-public abstract class StreamStorage extends OutputStream implements Disposable {
+public interface StreamStorageFactory {
 
     /**
-     * <p> Returns the {@code InputStream} to read back data from the store.
+     * <p> Creates the {@code StreamStorage}.
      *
-     * @return the {@code InputStream} to read back data from the store.
+     * @return The {@code StreamStorage}.
      */
-    public abstract InputStream getInputStream();
+    StreamStorage create();
+
+    /**
+     * @param file The File to write to.
+     * @param threshold The Threshold to be reached before the stream is written to disk.
+     * @return The {@code StreamStorage}
+     */
+    StreamStorage create(File file, int threshold);
 
 }

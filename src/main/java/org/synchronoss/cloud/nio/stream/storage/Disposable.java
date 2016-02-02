@@ -17,23 +17,19 @@
 package org.synchronoss.cloud.nio.stream.storage;
 
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
 /**
- * <p> Defines a storage that allows to store bytes and read them back.
- *     This class extends {@code OutputStream} to allow the write operations, and it exposes the {@link #getInputStream()} method
- *     to read the data back.
+ * A {@code Disposable} is a destination of data that can be discarded.
+ * The dispose method is invoked to dispose resources that the object is
+ * holding (such as open files or streams).
  *
- * @author Silvano Riz.
  */
-public abstract class StreamStorage extends OutputStream implements Disposable {
+public interface Disposable {
 
     /**
-     * <p> Returns the {@code InputStream} to read back data from the store.
+     * Dismiss and releases any system resources associated with this object. This includes closing streams and deleting
+     * any temporary files. If the resources are already discarded then invoking this method has no effect.
      *
-     * @return the {@code InputStream} to read back data from the store.
+     * @return <code>true</code> if and only if the file was created and it has been deleted successfully; <code>false</code> otherwise.
      */
-    public abstract InputStream getInputStream();
-
+    boolean dispose();
 }
