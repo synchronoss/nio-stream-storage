@@ -238,13 +238,13 @@ public class DeferredFileStreamStorageTest {
     }
 
     @Test
-    public void testDismiss_inMemory(){
+    public void testDispose_inMemory(){
 
         File file = new File(tempFolder.getRoot(), "testCloseQuietlyAndPurgeFile_inMemory.tmp");
         DeferredFileStreamStorage deferredFileStreamStorage = new DeferredFileStreamStorage(file, 3);
         assertEquals(deferredFileStreamStorage.storageMode, DeferredFileStreamStorage.StorageMode.MEMORY);
         assertFalse(file.exists());
-        assertTrue(deferredFileStreamStorage.dismiss());
+        assertTrue(deferredFileStreamStorage.dispose());
 
         Exception expected = null;
         try {
@@ -257,7 +257,7 @@ public class DeferredFileStreamStorageTest {
     }
 
     @Test
-    public void testDismiss() throws IOException {
+    public void testDispose() throws IOException {
 
         File file = new File(tempFolder.getRoot(), "testCloseQuietlyAndPurgeFile.tmp");
         DeferredFileStreamStorage deferredFileStreamStorage = new DeferredFileStreamStorage(file, 3);
@@ -267,7 +267,7 @@ public class DeferredFileStreamStorageTest {
         deferredFileStreamStorage.write(new byte[]{0x01, 0x02, 0x03, 0x4, 0x5});
         assertEquals(deferredFileStreamStorage.storageMode, DeferredFileStreamStorage.StorageMode.DISK);
         assertTrue(file.exists());
-        assertTrue(deferredFileStreamStorage.dismiss());
+        assertTrue(deferredFileStreamStorage.dispose());
         assertEquals(deferredFileStreamStorage.readWriteStatus, DeferredFileStreamStorage.ReadWriteStatus.DISMISSED);
 
         // Try to write

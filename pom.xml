@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <version>9</version>
     </parent>
 
     <groupId>org.synchronoss.cloud</groupId>
@@ -13,7 +13,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>nio-stream-storage</name>
-    <!--<url>https://github.com/synchronoss/nio-multipart</url>-->
+    <url>https://github.com/synchronoss/nio-stream-storage</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -162,6 +162,15 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <configuration>
+                    <keyname>${synchronoss.opensource.key}</keyname>
+                    <passphraseServerId>${synchronoss.opensource.key}</passphraseServerId>
+                </configuration>
+            </plugin>
+
         </plugins>
 
     </build>
@@ -179,11 +188,6 @@
         <developerConnection>scm:git:git@github.com:synchronoss/nio-stream-storage.git</developerConnection>
         <url>https://github.com/synchronoss/nio-stream-storage</url>
     </scm>
-
-    <!--<ciManagement>-->
-        <!--<system>Travis CI</system>-->
-        <!--<url>https://travis-ci.org/synchronoss/nio-multipart</url>-->
-    <!--</ciManagement>-->
 
     <developers>
         <developer>

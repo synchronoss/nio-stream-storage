@@ -13,30 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.synchronoss.cloud.nio.stream.storage;
 
-import java.io.File;
 
 /**
- * <p> A factory for {@code StreamStorage}.
- *
- * <p> Default implementation is {@link DeferredFileStreamStorageFactory}
+ * A {@code Disposable} is a destination of data that can be discarded.
+ * The dispose method is invoked to dispose resources that the object is
+ * holding (such as open files or streams).
  *
  */
-public interface StreamStorageFactory {
+public interface Disposable {
 
     /**
-     * <p> Creates the {@code StreamStorage}.
+     * Dismiss and releases any system resources associated with this object. This includes closing streams and deleting
+     * any temporary files. If the resources are already discarded then invoking this method has no effect.
      *
-     * @return The {@code StreamStorage}.
+     * @return <code>true</code> if and only if the file was created and it has been deleted successfully; <code>false</code> otherwise.
      */
-    StreamStorage create();
-
-    /**
-     * @param file The File to write to.
-     * @param threshold The Threshold to be reached before the stream is written to disk.
-     * @return The {@code StreamStorage}
-     */
-    StreamStorage create(File file, int threshold);
-
+    boolean dispose();
 }

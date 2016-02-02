@@ -203,7 +203,7 @@ public class DeferredFileStreamStorage extends StreamStorage {
      * @return <code>true</code> if and only if the file was created and it has been deleted successfully; <code>false</code> otherwise.
      */
     @Override
-    public boolean dismiss() {
+    public boolean dispose() {
         try {
             close(ReadWriteStatus.DISMISSED);
         } catch (Exception e) {

@@ -27,7 +27,7 @@ import java.io.OutputStream;
  *
  * @author Silvano Riz.
  */
-public abstract class StreamStorage extends OutputStream implements Dismissable {
+public abstract class StreamStorage extends OutputStream implements Disposable {
 
     /**
      * <p> Returns the {@code InputStream} to read back data from the store.
