@@ -2,6 +2,7 @@ package org.synchronoss.cloud.nio.stream.storage;
 
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 
 import static org.junit.Assert.*;
@@ -34,6 +35,13 @@ public class DeferredFileStreamStorageFactoryTest {
     }
 
     @Test
+    public void testGetTempFolder() {
+        assertEquals(new DeferredFileStreamStorageFactory(TEMP_TEST_FOLDER_PATH).getTempFolder().getPath(), TEMP_TEST_FOLDER_PATH);
+        assertEquals(new DeferredFileStreamStorageFactory().getTempFolder().getPath(), DeferredFileStreamStorageFactory.DEFAULT_TEMP_FOLDER);
+        assertEquals(new DeferredFileStreamStorageFactory(1).getTempFolder().getPath(), DeferredFileStreamStorageFactory.DEFAULT_TEMP_FOLDER);
+    }
+
+    @Test
     public void testConstructorGivenMax_error() {
         try {
             new DeferredFileStreamStorageFactory("", 1);
@@ -50,7 +58,7 @@ public class DeferredFileStreamStorageFactoryTest {
 
     @Test
     public void testCreate() throws IOException {
-        DeferredFileStreamStorageFactory deferredFileStreamStorageFactory = new DeferredFileStreamStorageFactory("temp_folder_path", 2);
+        DeferredFileStreamStorageFactory deferredFileStreamStorageFactory = new DeferredFileStreamStorageFactory(TEMP_TEST_FOLDER_PATH, 2);
         StreamStorage streamStorage = deferredFileStreamStorageFactory.create();
         assertTrue(streamStorage instanceof DeferredFileStreamStorage);
 
@@ -69,8 +77,8 @@ public class DeferredFileStreamStorageFactoryTest {
 
     @Test
     public void testCreateGivenThreshold() throws IOException {
-        DeferredFileStreamStorageFactory deferredFileStreamStorageFactory = new DeferredFileStreamStorageFactory("temp_folder_path", 2);
-        StreamStorage streamStorage = deferredFileStreamStorageFactory.create(4);
+        DeferredFileStreamStorageFactory deferredFileStreamStorageFactory = new DeferredFileStreamStorageFactory(TEMP_TEST_FOLDER_PATH, 2);
+        StreamStorage streamStorage = deferredFileStreamStorageFactory.create(new File(TEMP_TEST_FOLDER_PATH, "temp_file.tmp"),4);
         assertTrue(streamStorage instanceof DeferredFileStreamStorage);
 
         DeferredFileStreamStorage deferredFileStreamStorage = (DeferredFileStreamStorage) streamStorage;
