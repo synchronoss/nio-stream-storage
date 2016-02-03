@@ -17,7 +17,7 @@ package org.synchronoss.cloud.nio.stream.storage;
 
 /**
  * <p> A factory for {@code StreamStorage}.
- * <p/>
+ *
  * <p> Default implementation is {@link DeferredFileStreamStorageFactory}
  */
 public interface StreamStorageFactory {
