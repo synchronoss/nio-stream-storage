@@ -1,3 +1,5 @@
+https://travis-ci.org/synchronoss/nio-stream-storage.svg?branch=master
+
 NIO Stream Storage
 =============================
 
