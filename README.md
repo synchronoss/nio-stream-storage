@@ -1,7 +1,7 @@
-https://travis-ci.org/synchronoss/nio-stream-storage.svg?branch=master
-
 NIO Stream Storage
 =============================
+
+[![Master build Status](https://travis-ci.org/synchronoss/nio-stream-storage.svg?branch=master)](https://travis-ci.org/synchronoss/nio-stream-storage)
 
 Overview
 --------

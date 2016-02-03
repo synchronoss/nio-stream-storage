@@ -190,6 +190,11 @@
         <url>https://github.com/synchronoss/nio-stream-storage</url>
     </scm>
 
+    <ciManagement>
+        <system>Travis CI</system>
+        <url>https://travis-ci.org/synchronoss/nio-stream-storage</url>
+    </ciManagement>
+
     <developers>
         <developer>
             <id>silvano.riz</id>
