@@ -15,13 +15,10 @@
  */
 package org.synchronoss.cloud.nio.stream.storage;
 
-import java.io.File;
-
 /**
  * <p> A factory for {@code StreamStorage}.
- *
+ * <p/>
  * <p> Default implementation is {@link DeferredFileStreamStorageFactory}
- *
  */
 public interface StreamStorageFactory {
 
@@ -31,12 +28,5 @@ public interface StreamStorageFactory {
      * @return The {@code StreamStorage}.
      */
     StreamStorage create();
-
-    /**
-     * @param file The File to write to.
-     * @param threshold The Threshold to be reached before the stream is written to disk.
-     * @return The {@code StreamStorage}
-     */
-    StreamStorage create(File file, int threshold);
 
 }

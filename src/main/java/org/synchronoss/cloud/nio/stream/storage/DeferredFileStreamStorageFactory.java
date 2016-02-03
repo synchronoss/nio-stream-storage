@@ -76,9 +76,7 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
     }
 
     /**
-     *
      * <p> Constructor that uses a default threshold of 10kb and a default folder ${java.io.tmpdir}/nio-stream-storage.
-     *
      */
     public DeferredFileStreamStorageFactory() {
         this(DEFAULT_TEMP_FOLDER, DEFAULT_MAX_THRESHOLD);
@@ -93,18 +91,5 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
     public StreamStorage create() {
         final String tempFileName = String.format("stream-object-%s.tmp", UUID.randomUUID().toString());
         return new DeferredFileStreamStorage(new File(_tempFolder, tempFileName), _maxSizeThreshold, true);
-    }
-
-    @Override
-    public StreamStorage create(File tempFile, int threshold) {
-        return new DeferredFileStreamStorage(tempFile, threshold, true);
-    }
-
-    public int getMaxSizeThreshold() {
-        return _maxSizeThreshold;
-    }
-
-    public File getTempFolder() {
-        return _tempFolder;
     }
 }

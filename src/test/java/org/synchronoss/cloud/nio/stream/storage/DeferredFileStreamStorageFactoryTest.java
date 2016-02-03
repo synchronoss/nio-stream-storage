@@ -34,22 +34,6 @@ public class DeferredFileStreamStorageFactoryTest {
     }
 
     @Test
-    public void testGetMaxSizeThreshold() {
-        assertEquals(new DeferredFileStreamStorageFactory(1).getMaxSizeThreshold(), 1);
-        assertEquals(new DeferredFileStreamStorageFactory(0).getMaxSizeThreshold(), 0);
-        assertEquals(new DeferredFileStreamStorageFactory(-1).getMaxSizeThreshold(), 0);
-        assertEquals(new DeferredFileStreamStorageFactory().getMaxSizeThreshold(), DeferredFileStreamStorageFactory.DEFAULT_MAX_THRESHOLD);
-        assertEquals(new DeferredFileStreamStorageFactory(TEMP_TEST_FOLDER_PATH).getMaxSizeThreshold(), DeferredFileStreamStorageFactory.DEFAULT_MAX_THRESHOLD);
-    }
-
-    @Test
-    public void testGetTempFolder() {
-        assertEquals(new DeferredFileStreamStorageFactory(TEMP_TEST_FOLDER_PATH).getTempFolder().getPath(), TEMP_TEST_FOLDER_PATH);
-        assertEquals(new DeferredFileStreamStorageFactory().getTempFolder().getPath(), DeferredFileStreamStorageFactory.DEFAULT_TEMP_FOLDER);
-        assertEquals(new DeferredFileStreamStorageFactory(1).getTempFolder().getPath(), DeferredFileStreamStorageFactory.DEFAULT_TEMP_FOLDER);
-    }
-
-    @Test
     public void testConstructorGivenMax_error() {
         try {
             new DeferredFileStreamStorageFactory("", 1);
@@ -80,33 +64,6 @@ public class DeferredFileStreamStorageFactoryTest {
         assertTrue(deferredFileStreamStorage.isInMemory());
 
         deferredFileStreamStorage.write(testByteArray[2]);
-        assertFalse(deferredFileStreamStorage.isInMemory());
-
-        deferredFileStreamStorage.dispose();
-    }
-
-    @Test
-    public void testCreateGivenTempFileAndThreshold() throws IOException {
-        DeferredFileStreamStorageFactory deferredFileStreamStorageFactory = new DeferredFileStreamStorageFactory(TEMP_TEST_FOLDER_PATH, 2);
-        StreamStorage streamStorage = deferredFileStreamStorageFactory.create(new File(TEMP_TEST_FOLDER_PATH, "temp_file.tmp"), 4);
-        assertTrue(streamStorage instanceof DeferredFileStreamStorage);
-
-        DeferredFileStreamStorage deferredFileStreamStorage = (DeferredFileStreamStorage) streamStorage;
-        deferredFileStreamStorage.assertIsWritable();
-        assertTrue(deferredFileStreamStorage.isInMemory());
-
-        byte[] testByteArray = "This is a string".getBytes();
-        deferredFileStreamStorage.write(testByteArray[0]);
-        deferredFileStreamStorage.write(testByteArray[1]);
-        assertTrue(deferredFileStreamStorage.isInMemory());
-
-        deferredFileStreamStorage.write(testByteArray[2]);
-        assertTrue(deferredFileStreamStorage.isInMemory());
-
-        deferredFileStreamStorage.write(testByteArray[3]);
-        assertTrue(deferredFileStreamStorage.isInMemory());
-
-        deferredFileStreamStorage.write(testByteArray[4]);
         assertFalse(deferredFileStreamStorage.isInMemory());
 
         deferredFileStreamStorage.dispose();
