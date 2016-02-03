@@ -10,9 +10,11 @@
 
     <groupId>org.synchronoss.cloud</groupId>
     <artifactId>nio-stream-storage</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
-    <name>nio-stream-storage</name>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>A lightweight library to stream byte data using a combination of in memory and file storage.</description>
     <url>https://github.com/synchronoss/nio-stream-storage</url>
 
     <properties>
@@ -163,6 +165,18 @@
             </plugin>
 
             <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.6</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>
@@ -187,7 +201,7 @@
     <scm>
         <connection>scm:git:https://github.com/synchronoss/nio-stream-storage.git</connection>
         <developerConnection>scm:git:git@github.com:synchronoss/nio-stream-storage.git</developerConnection>
-        <url>https://github.com/synchronoss/nio-stream-storage</url>
+        <url>git@github.com:synchronoss/nio-stream-storage.git</url>
     </scm>
 
     <ciManagement>
@@ -212,6 +226,17 @@
             <id>mcla</id>
             <name>Melissa Clarke</name>
             <email>melissac1@gmail.com</email>
+            <organization>Synchronoss</organization>
+            <organizationUrl>http://www.synchronoss.com/</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+0</timezone>
+        </developer>
+        <developer>
+            <id>cjbooms</id>
+            <name>Conor Gallagher</name>
+            <email>cjbooms@gmail.com</email>
             <organization>Synchronoss</organization>
             <organizationUrl>http://www.synchronoss.com/</organizationUrl>
             <roles>
