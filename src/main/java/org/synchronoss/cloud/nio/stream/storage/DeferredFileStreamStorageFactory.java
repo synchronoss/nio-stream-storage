@@ -35,7 +35,7 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
      * Default max threshold. 10Kb
      */
     public static final int DEFAULT_MAX_THRESHOLD = 10240;
-    public static final String DEFAULT_TEMP_FOLDER = System.getProperty("java.io.tmpdir") + "nio-stream-storage";
+    public static final String DEFAULT_TEMP_FOLDER = System.getProperty("java.io.tmpdir") + "/nio-stream-storage";
 
     private final File _tempFolder;
     private final int _maxSizeThreshold;
