@@ -92,4 +92,17 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
         final String tempFileName = String.format("stream-object-%s.tmp", UUID.randomUUID().toString());
         return new DeferredFileStreamStorage(new File(_tempFolder, tempFileName), _maxSizeThreshold, true);
     }
+
+    /**
+     * Creates a new {@link DeferredFileStreamStorage} with a shutdown hook to release the resources on jvm shutdown.
+     *
+     * @return a {@link StreamStorage} to store bytes temporarily in-memory or on disk if over the configured threshold.
+     */
+    @Override
+    public StreamStorage createStorageWithDeleteOnExit() {
+        final String tempFileName = String.format("stream-object-%s.tmp", UUID.randomUUID().toString());
+        final File file = new File(_tempFolder, tempFileName);
+        file.deleteOnExit();
+        return new DeferredFileStreamStorage(file, _maxSizeThreshold, true);
+    }
 }
