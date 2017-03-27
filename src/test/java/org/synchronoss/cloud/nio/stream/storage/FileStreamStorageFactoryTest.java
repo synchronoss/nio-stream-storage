@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.*;
 
-public class DeferredFileStreamStorageFactoryTest {
+public class FileStreamStorageFactoryTest {
 
     private static final String TEMP_TEST_FOLDER_PATH = "temp_test_folder_path";
 
@@ -49,22 +49,41 @@ public class DeferredFileStreamStorageFactoryTest {
     }
 
     @Test
-    public void testCreate() throws IOException {
+    public void testCreateWhereThresholdIsGreaterThanZero() throws IOException {
         DeferredFileStreamStorageFactory deferredFileStreamStorageFactory = new DeferredFileStreamStorageFactory(TEMP_TEST_FOLDER_PATH, 2);
         StreamStorage streamStorage = deferredFileStreamStorageFactory.create();
-        assertTrue(streamStorage instanceof DeferredFileStreamStorage);
+        deferredFileStreamStorageFactory.setPurgeFileAfterReadComplete(true);
+        deferredFileStreamStorageFactory.setDeleteFilesOnDismiss(true);
 
-        DeferredFileStreamStorage deferredFileStreamStorage = (DeferredFileStreamStorage) streamStorage;
-        deferredFileStreamStorage.assertIsWritable();
-        assertTrue(deferredFileStreamStorage.isInMemory());
+        assertTrue(streamStorage instanceof FileStreamStorage);
+
+        FileStreamStorage deferredStreamStorage = (FileStreamStorage) streamStorage;
+        deferredStreamStorage.assertIsWritable();
+        assertTrue(deferredStreamStorage.isInMemory());
 
         byte[] testByteArray = "This is a string".getBytes();
+        deferredStreamStorage.write(testByteArray[0]);
+        deferredStreamStorage.write(testByteArray[1]);
+        assertTrue(deferredStreamStorage.isInMemory());
+
+        deferredStreamStorage.write(testByteArray[2]);
+        assertFalse(deferredStreamStorage.isInMemory());
+        deferredStreamStorage.dispose();
+    }
+
+    @Test
+    public void testCreateWhereThresholdIsZero() throws IOException {
+        DeferredFileStreamStorageFactory deferredFileStreamStorageFactory = new DeferredFileStreamStorageFactory(TEMP_TEST_FOLDER_PATH, 0);
+        StreamStorage streamStorage = deferredFileStreamStorageFactory.create();
+        deferredFileStreamStorageFactory.setPurgeFileAfterReadComplete(true);
+        deferredFileStreamStorageFactory.setDeleteFilesOnDismiss(true);
+        assertTrue(streamStorage instanceof FileStreamStorage);
+
+        FileStreamStorage deferredFileStreamStorage = (FileStreamStorage) streamStorage;
+        byte[] testByteArray = "This is a string".getBytes();
+
         deferredFileStreamStorage.write(testByteArray[0]);
         deferredFileStreamStorage.write(testByteArray[1]);
-        assertTrue(deferredFileStreamStorage.isInMemory());
-
-        deferredFileStreamStorage.write(testByteArray[2]);
-        assertFalse(deferredFileStreamStorage.isInMemory());
 
         deferredFileStreamStorage.dispose();
     }

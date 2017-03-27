@@ -25,25 +25,39 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * <p> {@code FileInputStream} that will purge the file when {@link #close()} is called.
+ * <p> Extension of {@code FileInputStream} that allows the file to be purged when {@link #close()} is called.
+ *
+ * <p> It also allows the user to obtain a handle to the underlying file by the {@link #getFile()}.
  *
  * @author Silvano Riz
  */
-public class PurgeOnCloseFileInputStream extends FileInputStream {
+public class NameAwarePurgableFileInputStream extends FileInputStream {
 
-    private static final Logger log = LoggerFactory.getLogger(PurgeOnCloseFileInputStream.class);
+    private static final Logger log = LoggerFactory.getLogger(NameAwarePurgableFileInputStream.class);
 
-    private final File fileToPurge;
+    private final File file;
+    private final boolean purgeFileOnClose;
 
     /**
      * <p> Constructor.
      *
      * @param file The file.
+     * @param purgeFileOnClose If set to {@code true} attempts to purge the file when the {@link #close()} is called.
      * @throws FileNotFoundException if the file does not exist, is a directory or it cannot be opened for reading.
      */
-    public PurgeOnCloseFileInputStream(final File file) throws FileNotFoundException {
+    public NameAwarePurgableFileInputStream(final File file, final boolean purgeFileOnClose) throws FileNotFoundException {
         super(file);
-        fileToPurge = file;
+        this.file = file;
+        this.purgeFileOnClose = purgeFileOnClose;
+    }
+
+
+    public NameAwarePurgableFileInputStream(final File file) throws FileNotFoundException {
+        this(file, false);
+    }
+
+    public File getFile() {
+        return file;
     }
 
     /**
@@ -55,9 +69,9 @@ public class PurgeOnCloseFileInputStream extends FileInputStream {
     @Override
     public void close() throws IOException {
         super.close();
-        if (fileToPurge.exists()){
-            if (!fileToPurge.delete()) {
-                log.warn("Failed to purge file: " + fileToPurge.getAbsolutePath());
+        if (purgeFileOnClose && file.exists()){
+            if (!file.delete()) {
+                log.warn("Failed to purge file: " + file.getAbsolutePath());
             }
         }
     }

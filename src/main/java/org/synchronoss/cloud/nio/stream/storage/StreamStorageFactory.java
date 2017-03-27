@@ -29,11 +29,4 @@ public interface StreamStorageFactory {
      */
     StreamStorage create();
 
-    /**
-     * <p> Creates the {@code StreamStorage} with a shutdown hook to release the resources on jvm shutdown.
-     *
-     * @return The {@code StreamStorage}.
-     */
-    StreamStorage createStorageWithDeleteOnExit();
-
 }
