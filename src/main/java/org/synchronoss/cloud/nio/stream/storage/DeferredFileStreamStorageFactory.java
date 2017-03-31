@@ -23,7 +23,7 @@ import java.io.File;
 import java.util.UUID;
 
 /**
- * A factory for {@link DeferredFileStreamStorage} that creates a {@link DeferredFileStreamStorage} to store the bytes in memory until the threshold
+ * A factory for {@link FileStreamStorage} that creates a {@link FileStreamStorage} to store the bytes in memory until the threshold
  * is reached and writes the remaining bytes to disk. If the threshold is never reached the data will remain in memory.
  */
 
@@ -37,24 +37,34 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
     public static final int DEFAULT_MAX_THRESHOLD = 10240;
     public static final String DEFAULT_TEMP_FOLDER = System.getProperty("java.io.tmpdir") + "/nio-stream-storage";
 
-    private final File _tempFolder;
-    private final int _maxSizeThreshold;
+    private final File tempFolder;
+    private final int maxSizeThreshold;
+    private boolean purgeFileAfterReadComplete = false;
+    private boolean deleteFilesOnDismiss = false;
+
+    public void setPurgeFileAfterReadComplete(boolean purgeFileAfterReadComplete) {
+        this.purgeFileAfterReadComplete = purgeFileAfterReadComplete;
+    }
+
+    public void setDeleteFilesOnDismiss(boolean deleteFilesOnDismiss) {
+        this.deleteFilesOnDismiss = deleteFilesOnDismiss;
+    }
 
     /**
      * <p> Constructor.
      *
-     * @param tempFolderPath   The path to the folder were temporary data will be stored if the max threshold id reached.
+     * @param tempFolderPath   The path to the folder where temporary data will be stored if the max threshold is reached.
      * @param maxSizeThreshold The threshold in bytes. When the data in memory exceeds this threshold it will be written to a temporary file.
      */
     public DeferredFileStreamStorageFactory(final String tempFolderPath, final int maxSizeThreshold) {
-        _tempFolder = new File(tempFolderPath);
-        if (!_tempFolder.exists()) {
-            if (!_tempFolder.mkdirs()) {
+        tempFolder = new File(tempFolderPath);
+        if (!tempFolder.exists()) {
+            if (!tempFolder.mkdirs()) {
                 throw new IllegalStateException("Unable to create the temporary folder: " + tempFolderPath);
             }
         }
-        _maxSizeThreshold = maxSizeThreshold > 0 ? maxSizeThreshold : 0;
-        if (log.isDebugEnabled()) log.debug("Temporary folder: " + _tempFolder.getAbsolutePath());
+        this.maxSizeThreshold = maxSizeThreshold > 0 ? maxSizeThreshold : 0;
+        if (log.isDebugEnabled()) log.debug("Temporary folder: " + tempFolder.getAbsolutePath());
     }
 
     /**
@@ -83,26 +93,14 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
     }
 
     /**
-     * Creates a new {@link DeferredFileStreamStorage}.
+     * Creates a new {@link FileStreamStorage}.
      *
      * @return a {@link StreamStorage} to store bytes temporarily in-memory or on disk if over the configured threshold.
      */
     @Override
     public StreamStorage create() {
         final String tempFileName = String.format("stream-object-%s.tmp", UUID.randomUUID().toString());
-        return new DeferredFileStreamStorage(new File(_tempFolder, tempFileName), _maxSizeThreshold, true);
+        return new FileStreamStorage(new File(tempFolder, tempFileName), maxSizeThreshold, purgeFileAfterReadComplete, deleteFilesOnDismiss, false);
     }
 
-    /**
-     * Creates a new {@link DeferredFileStreamStorage} with a shutdown hook to release the resources on jvm shutdown.
-     *
-     * @return a {@link StreamStorage} to store bytes temporarily in-memory or on disk if over the configured threshold.
-     */
-    @Override
-    public StreamStorage createStorageWithDeleteOnExit() {
-        final String tempFileName = String.format("stream-object-%s.tmp", UUID.randomUUID().toString());
-        final File file = new File(_tempFolder, tempFileName);
-        file.deleteOnExit();
-        return new DeferredFileStreamStorage(file, _maxSizeThreshold, true);
-    }
 }

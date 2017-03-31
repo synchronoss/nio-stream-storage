@@ -27,11 +27,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * <p> Unit tests for {@link PurgeOnCloseFileInputStream}
+ * <p> Unit tests for {@link NameAwarePurgableFileInputStream}
  *
  * @author Silvano Riz
  */
-public class PurgeOnCloseFileInputStreamTest {
+public class NameAwarePurgableFileInputStreamTest {
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
@@ -40,9 +40,9 @@ public class PurgeOnCloseFileInputStreamTest {
     public void testClose() throws Exception {
         File file = tempFolder.newFile("testClose");
         assertTrue(file.exists());
-        PurgeOnCloseFileInputStream purgeOnCloseFileInputStream = new PurgeOnCloseFileInputStream(file);
+        NameAwarePurgableFileInputStream nameAwarePurgableFileInputStream = new NameAwarePurgableFileInputStream(file, true);
         assertTrue(file.exists());
-        purgeOnCloseFileInputStream.close();
+        nameAwarePurgableFileInputStream.close();
         assertFalse(file.exists());
     }
 
@@ -50,9 +50,9 @@ public class PurgeOnCloseFileInputStreamTest {
     public void testClose_noFile() throws Exception {
         File file = tempFolder.newFile("testClose");
         assertTrue(file.exists());
-        PurgeOnCloseFileInputStream purgeOnCloseFileInputStream = new PurgeOnCloseFileInputStream(file);
+        NameAwarePurgableFileInputStream nameAwarePurgableFileInputStream = new NameAwarePurgableFileInputStream(file);
         assertTrue(file.delete());
-        purgeOnCloseFileInputStream.close();
+        nameAwarePurgableFileInputStream.close();
         assertFalse(file.exists());
     }
 
@@ -74,14 +74,23 @@ public class PurgeOnCloseFileInputStreamTest {
         };
         assertTrue(file.createNewFile());
         assertTrue(file.exists());
-        PurgeOnCloseFileInputStream purgeOnCloseFileInputStream = new PurgeOnCloseFileInputStream(file);
-        purgeOnCloseFileInputStream.close();
+        NameAwarePurgableFileInputStream nameAwarePurgableFileInputStream = new NameAwarePurgableFileInputStream(file, true);
+        nameAwarePurgableFileInputStream.close();
         assertTrue(file.exists());
 
         assertTrue(file.setReadable(true));
         assertTrue(file.setWritable(true));
         assertTrue(file.delete());
-
     }
 
+        @Test
+    public void testGetFile() throws Exception {
+        final String fileName = "testGetFile";
+
+        File file = tempFolder.newFile(fileName);
+            NameAwarePurgableFileInputStream nameAwarePurgableFileInputStream = new NameAwarePurgableFileInputStream(file);
+
+        assertTrue(nameAwarePurgableFileInputStream.getFile() != null);
+        assertTrue(nameAwarePurgableFileInputStream.getFile().getName().contains(fileName));
+    }
 }

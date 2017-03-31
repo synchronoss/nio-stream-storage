@@ -36,9 +36,9 @@ import java.io.*;
  *
  * @author Silvano Riz
  */
-public class DeferredFileStreamStorage extends StreamStorage {
+public class FileStreamStorage extends StreamStorage {
 
-    private static final Logger log = LoggerFactory.getLogger(DeferredFileStreamStorage.class);
+    private static final Logger log = LoggerFactory.getLogger(FileStreamStorage.class);
 
     enum ReadWriteStatus {
         READ, WRITE, DISMISSED
@@ -48,33 +48,88 @@ public class DeferredFileStreamStorage extends StreamStorage {
         MEMORY, DISK;
     }
 
-    static final int DEFAULT_THRESHOLD = 10240;//10kb
-
-    final File file;
-    final int threshold;
-    final boolean purgeFileAfterReadComplete;
+    private File file = null;
+    private int threshold;
+    private boolean append;
+    private boolean purgeFileAfterReadComplete = false;
+    private boolean deleteFilesOnDismiss = false;
 
     volatile ReadWriteStatus readWriteStatus;
     volatile StorageMode storageMode;
     volatile ByteArrayOutputStream byteArrayOutputStream;
     volatile FileOutputStream fileOutputStream;
 
+    /**
+     * <p> Returns a reference to a FileStreamStorage where the data is written to a file when the data is greater in
+     * size than the threshold specified.
+     *
+     * @param file The file that will be used to store the data if the threshold is reached.
+     * @param threshold The threshold in bytes. Data smaller than the threshold are kept in memory. If the threshold is reached, the data is flushed to the file.
+     * @param append boolean that indicates whether the file is going to be appended to or overridden.
+     *
+     * @return FileStreamStorage
+     */
+    public static FileStreamStorage deferred(final File file, final int threshold, final boolean append){
+        return new FileStreamStorage(file, threshold, append);
+    }
+
+    /**
+     * <p> Returns a reference to a FileStreamStorage where the data is always written to the file specified.
+     *
+     * @param file The file that will be used to store the data.
+     * @param append boolean that indicates whether any existing data in the file is going to be appended to or overridden.
+     *
+     * @return FileStreamStorage
+     */
+    public static FileStreamStorage directToFile(final File file, boolean append){
+        return new FileStreamStorage(file, 0, append);
+    }
+
+    public FileStreamStorage purgeFileAfterReadComplete(){
+        this.purgeFileAfterReadComplete = true;
+        return this;
+    }
+
+    public FileStreamStorage doNotPurgeFileAfterReadComplete(){
+        this.purgeFileAfterReadComplete = false;
+        return this;
+    }
+
+    public FileStreamStorage deleteFilesOnDismiss(){
+        this.deleteFilesOnDismiss = true;
+        return this;
+    }
+
     // ------------
     // CONSTRUCTORS
     // ------------
 
     /**
-     * <p> Constructor.
+     * <p> Constructor that sets the threshold to the user specified value.
      *
      * @param file The file that will be used to store the data if the threshold is reached.
-     * @param threshold The threshold in bytes. Data will be kept in memory until no more data is available or the threshold is reached. If the threshold is reached the data is flushed to disk, the memory is freed and the subsequent writes will go straight to disk. A threshold set to 0 or a negative value means that no memory will be used at all and writes go straight to disk.
-     * @param purgeFileAfterReadComplete boolean flag that if true it will purge the file after the data has been read. The purge happens when the close method is called on the input stream served by the instance via {@link #getInputStream()}.
+     * @param threshold The threshold in bytes. Data smaller than the threshold are kept in memory. If the threshold is reached, the data is flushed to disk.
+     * @param purgeFileAfterReadComplete boolean indicating whether the file should be deleted after been read.
+     * @param deleteFilesOnDismiss boolean indicating whether the file should be deleted after dismiss has been called.
+     *
      */
-    public DeferredFileStreamStorage(final File file, final int threshold, final boolean purgeFileAfterReadComplete) {
+    public FileStreamStorage(File file, int threshold, boolean purgeFileAfterReadComplete, boolean deleteFilesOnDismiss, boolean append) {
+        this(file, threshold, append);
+        this.purgeFileAfterReadComplete = purgeFileAfterReadComplete;
+        this.deleteFilesOnDismiss = deleteFilesOnDismiss;
+    }
+
+    /**
+     * <p> Constructor that sets the threshold to the user specified value.
+     *
+     * @param file The file that will be used to store the data if the threshold is reached.
+     * @param threshold The threshold in bytes. Data smaller than the threshold are kept in memory. If the threshold is reached, the data is flushed to disk.
+     */
+     FileStreamStorage(final File file, final int threshold, boolean append){
         this.file = file;
         this.threshold = threshold;
-        this.purgeFileAfterReadComplete = purgeFileAfterReadComplete;
         readWriteStatus = ReadWriteStatus.WRITE;
+        this.append = append;
         if(threshold <= 0){
             storageMode = StorageMode.DISK;
             fileOutputStream = newFileOutputStream();
@@ -84,33 +139,8 @@ public class DeferredFileStreamStorage extends StreamStorage {
         }
     }
 
-    /**
-     * <p> Constructor that uses the default threshold of 10kb
-     *
-     * @param file The file that will be used to store the data if the threshold is reached.
-     * @param purgeFileAfterReadComplete boolean flag that if true it will purge the file after the data has been read. The purge happens when the close method is called on the input stream served by the instance.
-     */
-    public DeferredFileStreamStorage(final File file, final boolean purgeFileAfterReadComplete){
-        this(file, DEFAULT_THRESHOLD, purgeFileAfterReadComplete);
-    }
-
-    /**
-     * <p> Constructor that sets the purgeFileAfterReadComplete to true by default.
-     *
-     * @param file The file that will be used to store the data if the threshold is reached.
-     * @param threshold The threshold in bytes. Data smaller than the threshold are kept in memory. If the threshold is reached, the data is flushed to disk.
-     */
-    public DeferredFileStreamStorage(final File file, final int threshold){
-        this(file, threshold, true);
-    }
-
-    /**
-     * <p> Constructor that uses the default threshold of 10kb and sets the purgeFileAfterReadComplete to true.
-     *
-     * @param file The file that will be used to store the data if the threshold is reached.
-     */
-    public DeferredFileStreamStorage(final File file){
-        this(file, DEFAULT_THRESHOLD, true);
+    File getFile() {
+        return this.file;
     }
 
     /**
@@ -209,7 +239,7 @@ public class DeferredFileStreamStorage extends StreamStorage {
         } catch (Exception e) {
             // Nothing to do
         }
-        return !(file != null && file.exists()) || file.delete();
+        return !(file != null && file.exists()) || (deleteFilesOnDismiss && file.delete());
     }
 
     void close(final ReadWriteStatus newReadWriteStatus) throws IOException {
@@ -249,19 +279,15 @@ public class DeferredFileStreamStorage extends StreamStorage {
 
     FileOutputStream newFileOutputStream(){
         try{
-            return new FileOutputStream(file);
+            return new FileOutputStream(file, append);
         }catch (Exception e){
             throw new IllegalStateException("Unable to create the outputStream.", e);
         }
     }
 
-    FileInputStream newFileInputStream(){
+    NameAwarePurgableFileInputStream newFileInputStream(){
         try{
-            if (purgeFileAfterReadComplete){
-                return new PurgeOnCloseFileInputStream(file);
-            }else{
-                return new FileInputStream(file);
-            }
+            return new NameAwarePurgableFileInputStream(file, purgeFileAfterReadComplete);
         }catch (Exception e){
             throw new IllegalStateException("Unable to create the inputStream.", e);
         }
