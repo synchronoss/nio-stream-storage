@@ -40,19 +40,14 @@ public class FileStreamStorageTest {
 
     @Test
     public void testConstructor() throws IOException{
-        assertNotNull(FileStreamStorage.deferred(new File(tempFolder.getRoot(), "testConstructor1.tmp"), 100, false).purgeFileAfterReadComplete());
-        assertNotNull(FileStreamStorage.deferred(new File(tempFolder.getRoot(), "testConstructor2.tmp"), -1, false).purgeFileAfterReadComplete());
-        assertNotNull(FileStreamStorage.deferred(new File(tempFolder.getRoot(), "testConstructor3.tmp"), 0, false).purgeFileAfterReadComplete());
-        assertNotNull(FileStreamStorage.deferred(new File(tempFolder.getRoot(), "testConstructor4.tmp"), 100, false));
+        assertNotNull(FileStreamStorage.deferred(new File(tempFolder.getRoot(), "testConstructor1.tmp"), 100).deleteFilesOnClose());
+        assertNotNull(FileStreamStorage.deferred(new File(tempFolder.getRoot(), "testConstructor2.tmp"), -1).deleteFilesOnClose());
+        assertNotNull(FileStreamStorage.deferred(new File(tempFolder.getRoot(), "testConstructor3.tmp"), 0).deleteFilesOnClose());
+        assertNotNull(FileStreamStorage.deferred(new File(tempFolder.getRoot(), "testConstructor4.tmp"), 100));
         assertNotNull(FileStreamStorage.directToFile(new File(tempFolder.getRoot(), "testConstructor5.tmp"), false));
-        assertNotNull(FileStreamStorage.directToFile(new File(tempFolder.getRoot(), "testConstructor6.tmp"), false).purgeFileAfterReadComplete());
-
-        assertNotNull(FileStreamStorage.deferred(new File(tempFolder.getRoot(), "testConstructor1.tmp"), 100, true).purgeFileAfterReadComplete());
-        assertNotNull(FileStreamStorage.deferred(new File(tempFolder.getRoot(), "testConstructor2.tmp"), -1, true).purgeFileAfterReadComplete());
-        assertNotNull(FileStreamStorage.deferred(new File(tempFolder.getRoot(), "testConstructor3.tmp"), 0, true).purgeFileAfterReadComplete());
-        assertNotNull(FileStreamStorage.deferred(new File(tempFolder.getRoot(), "testConstructor4.tmp"), 100, true));
+        assertNotNull(FileStreamStorage.directToFile(new File(tempFolder.getRoot(), "testConstructor6.tmp"), false).deleteFilesOnClose());
         assertNotNull(FileStreamStorage.directToFile(new File(tempFolder.getRoot(), "testConstructor5.tmp"), true));
-        assertNotNull(FileStreamStorage.directToFile(new File(tempFolder.getRoot(), "testConstructor6.tmp"), true).purgeFileAfterReadComplete());
+        assertNotNull(FileStreamStorage.directToFile(new File(tempFolder.getRoot(), "testConstructor6.tmp"), true).deleteFilesOnClose());
     }
 
     @Test
@@ -60,7 +55,7 @@ public class FileStreamStorageTest {
 
         File file = new File(tempFolder.getRoot(), "testWrite.tmp");
 
-        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(file, 3, false).purgeFileAfterReadComplete();
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(file, 3).deleteFilesOnClose();
         assertTrue(deferredFileStreamStorage.isInMemory());
         assertFalse(file.exists());
         assertEquals(0, deferredFileStreamStorage.byteArrayOutputStream.size());
@@ -86,7 +81,7 @@ public class FileStreamStorageTest {
 
         File file = new File(tempFolder.getRoot(), "testWrite1.tmp");
 
-        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(file, 3, false).purgeFileAfterReadComplete();
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(file, 3).deleteFilesOnClose();
         assertEquals(deferredFileStreamStorage.storageMode, FileStreamStorage.StorageMode.MEMORY);
         assertFalse(file.exists());
         assertEquals(0, deferredFileStreamStorage.byteArrayOutputStream.size());
@@ -110,7 +105,7 @@ public class FileStreamStorageTest {
 
         File file = new File(tempFolder.getRoot(), "testWrite2.tmp");
 
-        FileStreamStorage deferredFileStreamStorage = new FileStreamStorage(file, 3, false).purgeFileAfterReadComplete();
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(file, 3).deleteFilesOnClose();
         assertEquals(deferredFileStreamStorage.storageMode, FileStreamStorage.StorageMode.MEMORY);
         assertFalse(file.exists());
         assertEquals(0, deferredFileStreamStorage.byteArrayOutputStream.size());
@@ -156,7 +151,7 @@ public class FileStreamStorageTest {
 
         File file = new File(tempFolder.getRoot(), "testGetInputStream_memory.tmp");
 
-        FileStreamStorage deferredFileStreamStorage = new FileStreamStorage(file, 3, false).purgeFileAfterReadComplete();
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(file, 3).deleteFilesOnClose();
         assertEquals(deferredFileStreamStorage.storageMode, FileStreamStorage.StorageMode.MEMORY);
         assertFalse(file.exists());
         assertEquals(0, deferredFileStreamStorage.byteArrayOutputStream.size());
@@ -182,7 +177,7 @@ public class FileStreamStorageTest {
 
         File file = new File(tempFolder.getRoot(), "testGetInputStream_file_purgeOnClose.tmp");
 
-        FileStreamStorage deferredFileStreamStorage = new FileStreamStorage(file, 3, false).purgeFileAfterReadComplete();
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(file, 3).deleteFilesOnClose();
         assertEquals(deferredFileStreamStorage.storageMode, FileStreamStorage.StorageMode.MEMORY);
         assertFalse(file.exists());
         assertEquals(0, deferredFileStreamStorage.byteArrayOutputStream.size());
@@ -213,7 +208,7 @@ public class FileStreamStorageTest {
 
         File file = new File(tempFolder.getRoot(), "testGetInputStream_file.tmp");
 
-        FileStreamStorage deferredFileStreamStorage = new FileStreamStorage(file, 3, false);
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(file, 3);
         assertEquals(deferredFileStreamStorage.storageMode, FileStreamStorage.StorageMode.MEMORY);
         assertFalse(file.exists());
         assertEquals(0, deferredFileStreamStorage.byteArrayOutputStream.size());
@@ -244,7 +239,7 @@ public class FileStreamStorageTest {
 
         File file = new File(tempFolder.getRoot(), "testGetInputStream_OutputStreamNotClosed.tmp");
 
-        FileStreamStorage deferredFileStreamStorage = new FileStreamStorage(file, 3, false).purgeFileAfterReadComplete();
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(file, 3).deleteFilesOnClose();
         assertEquals(deferredFileStreamStorage.storageMode, FileStreamStorage.StorageMode.MEMORY);
         assertFalse(file.exists());
         assertEquals(0, deferredFileStreamStorage.byteArrayOutputStream.size());
@@ -271,7 +266,7 @@ public class FileStreamStorageTest {
     public void testDispose_inMemory(){
 
         File file = new File(tempFolder.getRoot(), "testCloseQuietlyAndPurgeFile_inMemory.tmp");
-        FileStreamStorage deferredFileStreamStorage = new FileStreamStorage(file, 3, false).purgeFileAfterReadComplete();
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(file, 3).deleteFilesOnClose();
         assertEquals(deferredFileStreamStorage.storageMode, FileStreamStorage.StorageMode.MEMORY);
         assertFalse(file.exists());
         assertTrue(deferredFileStreamStorage.dispose());
@@ -290,7 +285,7 @@ public class FileStreamStorageTest {
     public void testDispose() throws IOException {
 
         File file = new File(tempFolder.getRoot(), "testCloseQuietlyAndPurgeFile.tmp");
-        FileStreamStorage deferredFileStreamStorage = new FileStreamStorage(file, 3, false).purgeFileAfterReadComplete();
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(file, 3).deleteFilesOnClose();
         assertEquals(deferredFileStreamStorage.storageMode, FileStreamStorage.StorageMode.MEMORY);
         assertFalse(file.exists());
 
@@ -299,7 +294,7 @@ public class FileStreamStorageTest {
         assertTrue(file.exists());
         assertFalse(deferredFileStreamStorage.dispose());
         assertTrue(file.exists());
-        deferredFileStreamStorage.deleteFilesOnDismiss();
+        deferredFileStreamStorage.deleteFilesOnDispose();
         assertTrue(deferredFileStreamStorage.dispose());
         assertEquals(deferredFileStreamStorage.readWriteStatus, FileStreamStorage.ReadWriteStatus.DISMISSED);
 

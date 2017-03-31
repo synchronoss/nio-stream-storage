@@ -52,8 +52,8 @@ public class FileStreamStorageFactoryTest {
     public void testCreateWhereThresholdIsGreaterThanZero() throws IOException {
         DeferredFileStreamStorageFactory deferredFileStreamStorageFactory = new DeferredFileStreamStorageFactory(TEMP_TEST_FOLDER_PATH, 2);
         StreamStorage streamStorage = deferredFileStreamStorageFactory.create();
-        deferredFileStreamStorageFactory.setPurgeFileAfterReadComplete(true);
-        deferredFileStreamStorageFactory.setDeleteFilesOnDismiss(true);
+        deferredFileStreamStorageFactory.setDeleteFilesOnClose(true);
+        deferredFileStreamStorageFactory.setDeleteFilesOnDispose(true);
 
         assertTrue(streamStorage instanceof FileStreamStorage);
 
@@ -75,8 +75,8 @@ public class FileStreamStorageFactoryTest {
     public void testCreateWhereThresholdIsZero() throws IOException {
         DeferredFileStreamStorageFactory deferredFileStreamStorageFactory = new DeferredFileStreamStorageFactory(TEMP_TEST_FOLDER_PATH, 0);
         StreamStorage streamStorage = deferredFileStreamStorageFactory.create();
-        deferredFileStreamStorageFactory.setPurgeFileAfterReadComplete(true);
-        deferredFileStreamStorageFactory.setDeleteFilesOnDismiss(true);
+        deferredFileStreamStorageFactory.setDeleteFilesOnClose(true);
+        deferredFileStreamStorageFactory.setDeleteFilesOnDispose(true);
         assertTrue(streamStorage instanceof FileStreamStorage);
 
         FileStreamStorage deferredFileStreamStorage = (FileStreamStorage) streamStorage;
