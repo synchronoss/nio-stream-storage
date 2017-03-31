@@ -124,7 +124,7 @@ public class FileStreamStorage extends StreamStorage {
      * @param deleteFilesOnDispose boolean indicating whether the file should be deleted after dismiss has been called.
      *
      */
-    FileStreamStorage(final File file, final int threshold, final boolean deleteFilesOnClose, final boolean deleteFilesOnDispose, final boolean append) {
+    protected FileStreamStorage(final File file, final int threshold, final boolean deleteFilesOnClose, final boolean deleteFilesOnDispose, final boolean append) {
         this(file, threshold, append);
         this.deleteFilesOnClose = deleteFilesOnClose;
         this.deleteFilesOnDispose = deleteFilesOnDispose;
@@ -136,7 +136,7 @@ public class FileStreamStorage extends StreamStorage {
      * @param file The file that will be used to store the data if the threshold is reached.
      * @param threshold The threshold in bytes. Data smaller than the threshold are kept in memory. If the threshold is reached, the data is flushed to disk.
      */
-     FileStreamStorage(final File file, final int threshold, final boolean append){
+     protected FileStreamStorage(final File file, final int threshold, final boolean append){
         this.file = file;
         this.threshold = threshold;
         readWriteStatus = ReadWriteStatus.WRITE;
