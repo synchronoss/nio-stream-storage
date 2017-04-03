@@ -6,7 +6,7 @@ jdk:
   - oraclejdk8
   - oraclejdk7
 
-install: mvn install -U -Dgpg.skip=true
+install: mvn install -U
 
 cache:
   directories:
