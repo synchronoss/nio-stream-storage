@@ -318,4 +318,41 @@ public class FileStreamStorageTest {
 
     }
 
+    @Test
+    public void testMaxSize() throws IOException{
+
+        File fileMaxSize10Bytes = new File(tempFolder.getRoot(), "maxSize10Bytes.tmp");
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(fileMaxSize10Bytes, 3).maxSize(10);
+        deferredFileStreamStorage.write(new byte[]{0x01, 0x02, 0x03, 0x4, 0x5, 0x06, 0x07, 0x08, 0x09, 0x10});
+
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testMaxSize_exceetMaxSize() throws IOException{
+
+        File fileMaxSize10Bytes = new File(tempFolder.getRoot(), "maxSize10Bytes.tmp");
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(fileMaxSize10Bytes, 3).maxSize(10);
+        deferredFileStreamStorage.write(new byte[]{0x01, 0x02, 0x03, 0x4, 0x5, 0x06, 0x07, 0x08, 0x09, 0x10});
+        deferredFileStreamStorage.write(new byte[]{0x11});
+
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMaxSize_wrongMaxSize1() throws IOException{
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(new File(tempFolder.getRoot(), "data.tmp"), 3).maxSize(-2);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMaxSize_wrongMaxSize2() throws IOException{
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(new File(tempFolder.getRoot(), "data.tmp"), 3).maxSize(0);
+    }
+
+    @Test
+    public void testMaxSize_infinite() throws IOException{
+        FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(new File(tempFolder.getRoot(), "data.tmp"), 3).maxSize(-1);
+        deferredFileStreamStorage.write(new byte[]{0x01, 0x02, 0x03, 0x4, 0x5});
+        deferredFileStreamStorage.write(new byte[]{0x01, 0x02, 0x03, 0x4, 0x5});
+        deferredFileStreamStorage.write(new byte[]{0x01, 0x02, 0x03, 0x4, 0x5});
+    }
+
 }

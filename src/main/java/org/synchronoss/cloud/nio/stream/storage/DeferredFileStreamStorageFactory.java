@@ -40,10 +40,20 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
      * Default max threshold. 10Kb
      */
     public static final int DEFAULT_MAX_THRESHOLD = 10240;
-    public static final String DEFAULT_TEMP_FOLDER = System.getProperty("java.io.tmpdir") + "/nio-stream-storage";
 
-    private final File tempFolder;
+    /**
+     * <p> Default maximum size to set to the new {@link StreamStorage}s. The default is infinite and it can be changed via the {@link #setMaxSize(long)} method.
+     */
+    public static final int DEFAULT_MAX_SIZE = -1;
+
+    /**
+     * <p> Default location where the data files are stored.
+     */
+    public static final String DEFAULT_ROOT_FOLDER = System.getProperty("java.io.tmpdir") + "/nio-stream-storage";
+
+    private final File rootFolder;
     private final int maxSizeThreshold;
+    private long maxSize = DEFAULT_MAX_SIZE;
     private boolean deleteFilesOnClose = false;
     private boolean deleteFilesOnDispose = false;
 
@@ -55,21 +65,25 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
         this.deleteFilesOnDispose = deleteFilesOnDispose;
     }
 
+    public void setMaxSize(long maxSize) {
+        this.maxSize = maxSize;
+    }
+
     /**
      * <p> Constructor.
      *
-     * @param tempFolderPath   The path to the folder where temporary data will be stored if the max threshold is reached.
+     * @param rootFolderPath   The path to the folder where data files will be stored if the max threshold is reached.
      * @param maxSizeThreshold The threshold in bytes. When the data in memory exceeds this threshold it will be written to a temporary file.
      */
-    public DeferredFileStreamStorageFactory(final String tempFolderPath, final int maxSizeThreshold) {
-        tempFolder = new File(tempFolderPath);
-        if (!tempFolder.exists()) {
-            if (!tempFolder.mkdirs()) {
-                throw new IllegalStateException("Unable to create the temporary folder: " + tempFolderPath);
+    public DeferredFileStreamStorageFactory(final String rootFolderPath, final int maxSizeThreshold) {
+        rootFolder = new File(rootFolderPath);
+        if (!rootFolder.exists()) {
+            if (!rootFolder.mkdirs()) {
+                throw new IllegalStateException("Unable to create the temporary folder: " + rootFolderPath);
             }
         }
         this.maxSizeThreshold = maxSizeThreshold > 0 ? maxSizeThreshold : 0;
-        if (log.isDebugEnabled()) log.debug("Temporary folder: " + tempFolder.getAbsolutePath());
+        if (log.isDebugEnabled()) log.debug("Root folder for data files: " + rootFolder.getAbsolutePath());
     }
 
     /**
@@ -87,14 +101,14 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
      * @param maxSizeThreshold The threshold in bytes. When the data in memory exceeds this threshold it will be written to a temporary file.
      */
     public DeferredFileStreamStorageFactory(int maxSizeThreshold) {
-        this(DEFAULT_TEMP_FOLDER, maxSizeThreshold);
+        this(DEFAULT_ROOT_FOLDER, maxSizeThreshold);
     }
 
     /**
      * <p> Constructor that uses a default threshold of 10kb and a default folder ${java.io.tmpdir}/nio-stream-storage.
      */
     public DeferredFileStreamStorageFactory() {
-        this(DEFAULT_TEMP_FOLDER, DEFAULT_MAX_THRESHOLD);
+        this(DEFAULT_ROOT_FOLDER, DEFAULT_MAX_THRESHOLD);
     }
 
     /**
@@ -104,8 +118,16 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
      */
     @Override
     public StreamStorage create() {
-        final String tempFileName = String.format("stream-object-%s.tmp", UUID.randomUUID().toString());
-        return new FileStreamStorage(new File(tempFolder, tempFileName), maxSizeThreshold, deleteFilesOnClose, deleteFilesOnDispose, false);
+        return new FileStreamStorage(new File(rootFolder, getFileName()), maxSizeThreshold, deleteFilesOnClose, deleteFilesOnDispose, false, maxSize);
+    }
+
+    /**
+     * <p> Generates an unique file name for the data file.
+     *
+     * @return The unique file name.
+     */
+    protected String getFileName(){
+        return String.format("stream-object-%s.tmp", UUID.randomUUID().toString());
     }
 
 }

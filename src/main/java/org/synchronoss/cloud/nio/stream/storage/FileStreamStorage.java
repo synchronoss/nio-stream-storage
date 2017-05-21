@@ -58,6 +58,8 @@ public class FileStreamStorage extends StreamStorage {
     volatile File file = null;
     volatile int threshold;
     volatile boolean append;
+    volatile long maxSize = -1;
+    volatile long bytesWritten = 0;
     volatile boolean deleteFilesOnClose = false;
     volatile boolean deleteFilesOnDispose = false;
 
@@ -111,6 +113,19 @@ public class FileStreamStorage extends StreamStorage {
         return this;
     }
 
+    /**
+     * <p> Configures the current {@link FileStreamStorage} to accept up to {@code maxSize} bytes.
+     *     If the threshold is exceeded the storage will throw an {@link IllegalStateException}
+     *
+     * @param maxSize The max size in bytes accepted by this storage. A value of -1 indicates infinite, the value 0 or a value lower that -1 is not accepted.
+     * @return The current object
+     */
+    public FileStreamStorage maxSize(final long maxSize){
+        checkMaxSizeParameterIsValid(maxSize);
+        this.maxSize = maxSize;
+        return this;
+    }
+
     // ------------
     // CONSTRUCTORS
     // ------------
@@ -122,10 +137,12 @@ public class FileStreamStorage extends StreamStorage {
      * @param threshold The threshold in bytes. Data smaller than the threshold are kept in memory. If the threshold is reached, the data is flushed to disk.
      * @param deleteFilesOnClose boolean indicating whether the file should be deleted after been read.
      * @param deleteFilesOnDispose boolean indicating whether the file should be deleted after dismiss has been called.
-     *
+     * @param maxSize The maximum amount of bytes that the storage can accept. A value of -1 indicates infinite, the value 0 or a value lower that -1 is not accepted.
      */
-    protected FileStreamStorage(final File file, final int threshold, final boolean deleteFilesOnClose, final boolean deleteFilesOnDispose, final boolean append) {
+    protected FileStreamStorage(final File file, final int threshold, final boolean deleteFilesOnClose, final boolean deleteFilesOnDispose, final boolean append, long maxSize) {
         this(file, threshold, append);
+        checkMaxSizeParameterIsValid(maxSize);
+        this.maxSize = maxSize;
         this.deleteFilesOnClose = deleteFilesOnClose;
         this.deleteFilesOnDispose = deleteFilesOnDispose;
     }
@@ -139,7 +156,7 @@ public class FileStreamStorage extends StreamStorage {
      protected FileStreamStorage(final File file, final int threshold, final boolean append){
         this.file = file;
         this.threshold = threshold;
-        readWriteStatus = ReadWriteStatus.WRITE;
+        this.readWriteStatus = ReadWriteStatus.WRITE;
         this.append = append;
         if(threshold <= 0){
             storageMode = StorageMode.DISK;
@@ -160,6 +177,7 @@ public class FileStreamStorage extends StreamStorage {
     @Override
     public void write(int b) throws IOException {
         assertIsWritable();
+        assertMaxSize(1);
         if (checkThreshold(1)){
             byteArrayOutputStream.write(b);
         }else{
@@ -173,6 +191,7 @@ public class FileStreamStorage extends StreamStorage {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         assertIsWritable();
+        assertMaxSize(len);
         if (checkThreshold(len)){
             byteArrayOutputStream.write(b, off, len);
         }else{
@@ -186,6 +205,7 @@ public class FileStreamStorage extends StreamStorage {
     @Override
     public void write(byte[] b) throws IOException {
         assertIsWritable();
+        assertMaxSize(b.length);
         if (checkThreshold(b.length)){
             byteArrayOutputStream.write(b);
         }else{
@@ -301,6 +321,22 @@ public class FileStreamStorage extends StreamStorage {
             return new NameAwarePurgableFileInputStream(file, deleteFilesOnClose);
         }catch (Exception e){
             throw new IllegalStateException("Unable to create the inputStream.", e);
+        }
+    }
+
+    void assertMaxSize(long numBytesToBeWritten){
+        if (maxSize == -1){
+            return;// The storage can accept an infinite amount of bytes
+        }
+        bytesWritten += numBytesToBeWritten;
+        if (bytesWritten > maxSize){
+            throw new IllegalStateException("Exceeded the number of bytes allowed to be written to the storage. Max Size: " + maxSize);
+        }
+    }
+
+    void checkMaxSizeParameterIsValid(final long maxSize){
+        if (maxSize < -1 || maxSize == 0){
+            throw new IllegalArgumentException("Invalid max size " + maxSize);
         }
     }
 }
