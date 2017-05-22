@@ -36,6 +36,7 @@ Additionally, the `FileStreamStorage` can be configured to:
  * Delete the underlying file after the `FileStreamStorage` is disposed.
  * Delete the underlying file after the `InputStream` supplied by the `FileStreamStorage` is closed.
  * Append the data to the underlying file. This option is only available when the threshold is set to 0 and it is made available to support scenarios where the write needs to be resumed.
+ * Enforce a capacity limit. Exceeding the capacity will result in an error (IllegalStateException)
 
 Usage
 -----
