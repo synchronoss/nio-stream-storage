@@ -42,9 +42,9 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
     public static final int DEFAULT_MAX_THRESHOLD = 10240;
 
     /**
-     * <p> Default maximum size to set to the new {@link StreamStorage}s. The default is infinite and it can be changed via the {@link #setMaxSize(long)} method.
+     * <p> Default maximum capacity to set to the new {@link StreamStorage}s. The default is infinite and it can be changed via the {@link #setMaxCapacity(long)} method.
      */
-    public static final int DEFAULT_MAX_SIZE = -1;
+    public static final int DEFAULT_MAX_CAPACITY = -1;
 
     /**
      * <p> Default location where the data files are stored.
@@ -53,7 +53,7 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
 
     private final File rootFolder;
     private final int maxSizeThreshold;
-    private long maxSize = DEFAULT_MAX_SIZE;
+    private long maxCapacity = DEFAULT_MAX_CAPACITY;
     private boolean deleteFilesOnClose = false;
     private boolean deleteFilesOnDispose = false;
 
@@ -65,8 +65,8 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
         this.deleteFilesOnDispose = deleteFilesOnDispose;
     }
 
-    public void setMaxSize(long maxSize) {
-        this.maxSize = maxSize;
+    public void setMaxCapacity(long maxCapacity) {
+        this.maxCapacity = maxCapacity;
     }
 
     /**
@@ -118,7 +118,7 @@ public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
      */
     @Override
     public StreamStorage create() {
-        return new FileStreamStorage(new File(rootFolder, getFileName()), maxSizeThreshold, deleteFilesOnClose, deleteFilesOnDispose, false, maxSize);
+        return new FileStreamStorage(new File(rootFolder, getFileName()), maxSizeThreshold, deleteFilesOnClose, deleteFilesOnDispose, false, maxCapacity);
     }
 
     /**

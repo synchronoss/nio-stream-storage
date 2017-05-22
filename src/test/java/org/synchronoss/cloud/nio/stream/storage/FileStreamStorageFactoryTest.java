@@ -91,13 +91,13 @@ public class FileStreamStorageFactoryTest {
     @Test
     public void testCreateMaxSize() throws IOException {
         DeferredFileStreamStorageFactory deferredFileStreamStorageFactory = new DeferredFileStreamStorageFactory(TEMP_TEST_FOLDER_PATH, 0);
-        deferredFileStreamStorageFactory.setMaxSize(10);
+        deferredFileStreamStorageFactory.setMaxCapacity(10);
         StreamStorage streamStorage = deferredFileStreamStorageFactory.create();
 
         assertTrue(streamStorage instanceof FileStreamStorage);
 
         FileStreamStorage deferredFileStreamStorage = (FileStreamStorage) streamStorage;
-        assertEquals(10, deferredFileStreamStorage.maxSize);
+        assertEquals(10, deferredFileStreamStorage.maxCapacity);
     }
 
     private static void assertConstructorException(Exception e) {
