@@ -20,13 +20,20 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * <p> Unit test for {@link FileStreamStorage}
@@ -34,6 +41,8 @@ import static org.junit.Assert.*;
  * @author Silvano Riz.
  */
 public class FileStreamStorageTest {
+
+    private static final Logger log = LoggerFactory.getLogger(FileStreamStorageTest.class);
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
@@ -327,10 +336,20 @@ public class FileStreamStorageTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testMaxCapacity_exceed() throws IOException{
+    public void testMaxCapacity_exceed() throws IOException {
 
         FileStreamStorage deferredFileStreamStorage = FileStreamStorage.deferred(new File(tempFolder.getRoot(), "tenBytes_exceed.tmp"), 3).maxCapacity(10);
-        deferredFileStreamStorage.write(new byte[]{0x01, 0x02, 0x03, 0x4, 0x5, 0x06, 0x07, 0x08, 0x09, 0x10});
+
+        boolean first10BytesWrittenWithoutErrors = true;
+        try{
+            deferredFileStreamStorage.write(new byte[]{0x01, 0x02, 0x03, 0x4, 0x5, 0x06, 0x07, 0x08, 0x09, 0x10});
+        }catch (Exception e){
+            log.error("Unexpected exception", e);
+            first10BytesWrittenWithoutErrors = false;
+        }
+        assertTrue(first10BytesWrittenWithoutErrors);
+
+        // This call should throw the IllegalStateException
         deferredFileStreamStorage.write(new byte[]{0x11});
 
     }

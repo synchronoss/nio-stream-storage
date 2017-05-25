@@ -29,6 +29,7 @@ import java.io.*;
  *     <li>Allows to automatically delete the file after the object is disposed via the {@link #dispose()} method</li>
  *     <li>Allows to automatically delete the file after the {@link InputStream} returned by the {@link #getInputStream()} method is closed.</li>
  *     <li>Allows to append the data to the underlying file (useful for resuming writes).</li>
+ *     <li>Allows to set a maximum capacity.</li>
  * </ul>
  *
  * <p> The {@code FileStreamStorage} has two distinct states:

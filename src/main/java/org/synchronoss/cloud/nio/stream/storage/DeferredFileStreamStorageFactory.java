@@ -30,6 +30,7 @@ import java.util.UUID;
  *     <li>Set a specific memory threshold that will be set to the created {@link FileStreamStorage}s</li>
  *     <li>Create {@link FileStreamStorage}s that will delete the underlying file after closing its {@link java.io.InputStream}</li>
  *     <li>Create {@link FileStreamStorage}s that will delete the underlying file after disposing the {@link FileStreamStorage} itself</li>
+ *     <li>Create {@link FileStreamStorage}s with a maximum capacity</li>
  * </ul>
  */
 public class DeferredFileStreamStorageFactory implements StreamStorageFactory {
