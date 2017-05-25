@@ -16,7 +16,7 @@ Latest Release
 <dependency>
     <groupId>org.synchronoss.cloud</groupId>
     <artifactId>nio-stream-storage</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.3</version>
 </dependency>
 ```
 
@@ -60,6 +60,7 @@ Close the InputStream to cleanup the underlying file:
 ```java
 inputStream.close()
 ```
+
 Advanced Configuration
 ----------------------
 It is possible to configure an in-memory threshold before storing data on disk. If configured the data is flushed to disk only
